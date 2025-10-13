@@ -19,7 +19,7 @@ export default class Server {
     this.app.use(cors()); // express usa el middlewares cors; este permite conexiones remotas
     this.app.use(express.json()); // permite interpretar los datos que lleguen en la solicitud en formato json
     this.app.use(morgan("dev")); // nos ofrece datos extras en la terminal
-    // configurar un archivo estatico
+    // configurar un archivo estático
     const __dirname = dirname(fileURLToPath(import.meta.url));
     console.log(__dirname);
     console.log(__dirname + "/public");
