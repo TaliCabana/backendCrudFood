@@ -8,7 +8,7 @@ export const prueba = (req, res) => {
 
 export const crearProducto = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     // 1- Verificar que lleguen los datos validados
     // 2- Pedir al modelo Producto crear el objeto en la BD
     //console.log(req.body);
@@ -39,10 +39,12 @@ export const obtenerProducto = async (req, res) => {
   try {
     console.log(req.params.id);
     const productoBuscado = await Producto.findById(req.params.id);
-    if(!productoBuscado){
-      return res.status(404).json({ mensaje: "No se encontró el producto buscado"})
+    if (!productoBuscado) {
+      return res
+        .status(404)
+        .json({ mensaje: "No se encontró el producto buscado" });
     }
-    res.status(200).json(productoBuscado)
+    res.status(200).json(productoBuscado);
   } catch (error) {
     console.error(error);
     res
@@ -53,13 +55,15 @@ export const obtenerProducto = async (req, res) => {
 
 export const borrarProductoPorId = async (req, res) => {
   try {
-    console.log(req.params.id);
-    const productoBuscado = await Producto.findById(req.params.id);
-    if(!productoBuscado){
-      return res.status(404).json({ mensaje: "No se encontró el producto buscado"})
+    const productoBuscado = await Producto.findByIdAndDelete(req.params.id);
+    if (!productoBuscado) {
+      return res
+        .status(404)
+        .json({ mensaje: "No se encontró el producto buscado" });
     }
-    await Producto.findByIdAndDelete(req.params.id)
-    res.status(200).json({mensaje: "El producto fue eliminado correctamente"})
+    res
+      .status(200)
+      .json({ mensaje: "El producto fue eliminado correctamente" });
   } catch (error) {
     console.error(error);
     res
@@ -70,12 +74,16 @@ export const borrarProductoPorId = async (req, res) => {
 
 export const editarProductoPorId = async (req, res) => {
   try {
-    const productoBuscado = await Producto.findById(req.params.id);
-    if(!productoBuscado){
-      return res.status(404).json({ mensaje: "No se encontró el producto buscado"})
+    const productoBuscado = await Producto.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    );
+    if (!productoBuscado) {
+      return res
+        .status(404)
+        .json({ mensaje: "No se encontró el producto buscado" });
     }
-    await Producto.findByIdAndUpdate(req.params.id, req.body)
-    res.status(200).json({mensaje: "El producto fue editado correctamente"})
+    res.status(200).json({ mensaje: "El producto fue editado correctamente" });
   } catch (error) {
     console.error(error);
     res
