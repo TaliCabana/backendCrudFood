@@ -13,6 +13,6 @@ const router = Router();
 
 router.route('/test').get(prueba)
 router.route('/').post(validacionProducto, crearProducto).get(listarProductos)
-router.route('/:id').get(obtenerProducto).delete(borrarProductoPorId).put(editarProductoPorId)
+router.route('/:id').get(obtenerProducto).delete(borrarProductoPorId).put(validacionProducto, editarProductoPorId)
 
 export default router;
