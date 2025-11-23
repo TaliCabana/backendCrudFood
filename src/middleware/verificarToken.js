@@ -14,7 +14,7 @@ const verificarJWT = (req, res, next) => {
         next()
     } catch (error) {
         console.error(error);
-        res.status(401).json({mensaje: 'Token no válido'})
+        res.status(401).json({mensaje: 'Token no válido', error: error.message})
     }
 }
 

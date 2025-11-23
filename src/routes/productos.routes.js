@@ -15,6 +15,6 @@ const router = Router();
 
 router.route('/test').get(prueba)
 router.route('/').post(verificarJWT, validacionProducto, crearProducto).get(listarProductos)
-router.route('/:id').get(validacionIdProducto, obtenerProducto).delete(borrarProductoPorId).put([validacionIdProducto, validacionProducto], editarProductoPorId)
+router.route('/:id').get(validacionIdProducto, obtenerProducto).delete([verificarJWT, validacionIdProducto],borrarProductoPorId).put([verificarJWT, validacionIdProducto, validacionProducto], editarProductoPorId)
 
 export default router;
