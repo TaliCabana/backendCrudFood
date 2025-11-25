@@ -97,9 +97,9 @@ export const editarProductoPorId = async (req, res) => {
         .json({ mensaje: "No se encontró el producto buscado" });
     }
 
-    const productoActualizado = {...req.body, imagen: productoBuscado.imagen}
+    const productoActualizado = { ...req.body, imagen: productoBuscado.imagen };
 
- /*    // Con esto se mantiene la imagen actual por defecto:
+    /*    // Con esto se mantiene la imagen actual por defecto:
     let imagenUrl = productoBuscado.imagen; // Conservame del producto que encontré su imagen */
 
     // Si hubiera una imagen nueva => subir a Cloudinary
@@ -108,10 +108,12 @@ export const editarProductoPorId = async (req, res) => {
       productoActualizado.imagen = resultado.secure_url;
     }
 
-    await Producto.updateOne({_id: req.params.id}, {$set: productoActualizado})
+    await Producto.updateOne(
+      { _id: req.params.id },
+      { $set: productoActualizado }
+    );
 
-    
-/*       // Actualizo los campos
+    /*       // Actualizo los campos
     productoBuscado.nombreProducto = req.body.nombreProducto;
     productoBuscado.precio = req.body.precio;
     productoBuscado.descripcion_breve = req.body.descripcion_breve;
@@ -129,5 +131,29 @@ export const editarProductoPorId = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrió un error, no se pudo editar el productos" });
+  }
+};
+
+export const productosPaginados = async (req, res) => {
+  try {
+    console.log(req.query);
+    const page = req.query.page || 1; // qué pag muestro
+    const limit = req.query.limit || 10; // cant de prod por pag
+    const skip = (page - 1) * limit; // nro de salto
+
+    const[productos, cantidadProductos] = await Promise.all([Producto.find().skip(skip).limit(limit), Producto.countDocuments()])
+    res.status(200).json({
+      productos,
+      paginaActual: page,
+      cantidadProductos,
+      cantPaginas: Math.ceil(cantidadProductos / limit)
+    })
+    // Tengo que devolver: productos, paginaActual, cantidadProductos, cantPaginas
+
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrió un error al listar los productos paginados." });
   }
 };
