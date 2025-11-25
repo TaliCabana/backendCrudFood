@@ -1,3 +1,4 @@
+import subirImagenACloudinary from "../helpers/cloudinaryUploader.js";
 import Producto from "../models/productos.js";
 
 export const prueba = (req, res) => {
@@ -8,11 +9,26 @@ export const prueba = (req, res) => {
 
 export const crearProducto = async (req, res) => {
   try {
-    console.log(req.body);
-    // 1- Verificar que lleguen los datos validados
-    // 2- Pedir al modelo Producto crear el objeto en la BD
-    //console.log(req.body);
-    const productoNuevo = new Producto(req.body);
+    let imagenUrl = "";
+
+    if (req.file) {
+      const resultado = await subirImagenACloudinary(req.file.buffer);
+      /*       console.log(resultado) */
+      imagenUrl = resultado.secure_url;
+    } else {
+      imagenUrl =
+        "https://images.pexels.com/photos/126790/pexels-photo-126790.jpeg"; // imagen provisoria
+    }
+
+    /* Una forma: 
+/*      req.body.imagen = imagenUrl
+        const productoNuevo = new Producto(req.body); */
+
+    /* Otra forma */
+    const productoNuevo = new Producto({
+      ...req.body,
+      imagen: imagenUrl,
+    });
     await productoNuevo.save();
     res.status(201).json("El producto fue creado exitosamente");
   } catch (error) {
@@ -74,15 +90,39 @@ export const borrarProductoPorId = async (req, res) => {
 
 export const editarProductoPorId = async (req, res) => {
   try {
-    const productoBuscado = await Producto.findByIdAndUpdate(
-      req.params.id,
-      req.body
-    );
+    const productoBuscado = await Producto.findById(req.params.id, req.body);
     if (!productoBuscado) {
       return res
         .status(404)
         .json({ mensaje: "No se encontró el producto buscado" });
     }
+
+    const productoActualizado = {...req.body, imagen: productoBuscado.imagen}
+
+ /*    // Con esto se mantiene la imagen actual por defecto:
+    let imagenUrl = productoBuscado.imagen; // Conservame del producto que encontré su imagen */
+
+    // Si hubiera una imagen nueva => subir a Cloudinary
+    if (req.file) {
+      const resultado = await subirImagenACloudinary(req.file.buffer);
+      productoActualizado.imagen = resultado.secure_url;
+    }
+
+    await Producto.updateOne({_id: req.params.id}, {$set: productoActualizado})
+
+    
+/*       // Actualizo los campos
+    productoBuscado.nombreProducto = req.body.nombreProducto;
+    productoBuscado.precio = req.body.precio;
+    productoBuscado.descripcion_breve = req.body.descripcion_breve;
+    productoBuscado.descripcion_amplia = req.body.descripcion_amplia;
+    productoBuscado.categoria = req.body.categoria;
+    productoBuscado.imagen = imagenUrl;
+
+
+    // Guardo
+    await productoBuscado.save(); // para guardar los datos editados */
+
     res.status(200).json({ mensaje: "El producto fue editado correctamente" });
   } catch (error) {
     console.error(error);
